@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Переименовать тему &middot; {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="panel panel-wide mx-auto">
+  <div class="panel-head">
+    <h1 class="h5 mb-0">Переименовать тему</h1>
+    <span class="meta wrap-any">сейчас: {{ topic.text }}</span>
+  </div>
+  <div class="panel-body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <div class="d-flex flex-wrap">
+        {% bootstrap_button 'Сохранить' button_type='submit' button_class='btn-accent mr-2 mb-2' %}
+        <a class="btn btn-outline-secondary mb-2" href="{% url 'learning_logs:topic' topic.pk %}">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

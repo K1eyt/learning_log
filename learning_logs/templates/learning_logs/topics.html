@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if archived %}Архив{% else %}Мои темы{% endif %} &middot; {{ block.super }}{% endblock %}
+
+{% block menu %}
+  <li class="nav-item"><a class="nav-link active" href="{% url 'learning_logs:topics' %}">Темы</a></li>
+{% endblock %}
+
+{% block menu_actions %}
+  <li class="nav-item"><a class="nav-link" href="{% url 'learning_logs:new_topic' %}">Новая тема</a></li>
+{% endblock %}
+
+{% block page_header %}
+<div class="page-head">
+  <div>
+    <h1>{% if archived %}Архив{% else %}Мои темы{% endif %}</h1>
+    <p class="subtitle">Темы видите только вы.</p>
+  </div>
+  <a class="btn btn-accent" href="{% url 'learning_logs:new_topic' %}">Новая тема</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-3 sidebar mb-3">
+    <div class="panel">
+      <div class="panel-body">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link{% if not archived %} active{% endif %}" href="{% url 'learning_logs:topics' %}">
+              В работе <span class="count">{{ counts.active }}</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if archived %} active{% endif %}" href="{% url 'learning_logs:topics' %}?archived=1">
+              Архив <span class="count">{{ counts.archived }}</span></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+    <form method="get" class="mb-3" role="search">
+      {% if archived %}<input type="hidden" name="archived" value="1">{% endif %}
+      <div class="input-group">
+        <input type="search" name="q" value="{{ query }}" class="form-control"
+               placeholder="Поиск по названиям тем и тексту записей" aria-label="Поиск">
+        <div class="input-group-append">
+          <button class="btn btn-outline-accent" type="submit">Найти</button>
+          {% if query %}
+            <a class="btn btn-outline-secondary"
+               href="{% url 'learning_logs:topics' %}{% if archived %}?archived=1{% endif %}">Сброс</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    {% if topics %}
+      <div class="panel">
+        <div class="list-group list-group-flush">
+          {% for topic in topics %}{% include 'learning_logs/_topic_row.html' %}{% endfor %}
+        </div>
+      </div>
+    {% elif query %}
+      <div class="empty">
+        <span class="icon" aria-hidden="true">🔍</span>
+        По запросу «{{ query }}» ничего не нашлось.
+      </div>
+    {% elif archived %}
+      <div class="empty">
+        <span class="icon" aria-hidden="true">📦</span>
+        Архив пуст.
+      </div>
+    {% else %}
+      <div class="empty">
+        <span class="icon" aria-hidden="true">📗</span>
+        <p>Тем пока нет. Начните с того, что изучаете прямо сейчас.</p>
+        <a class="btn btn-accent" href="{% url 'learning_logs:new_topic' %}">Создать первую тему</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% comment %}Строка списка тем. Ожидает переменную topic с полями счётчиков.{% endcomment %}
+<div class="list-group-item d-flex align-items-center">
+  <form method="post" action="{% url 'learning_logs:toggle_favorite' topic.pk %}" class="mr-3">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="btn btn-link p-0 star{% if topic.is_favorite %} on{% endif %}"
+            title="{% if topic.is_favorite %}Убрать из избранного{% else %}В избранное{% endif %}"
+            aria-label="{% if topic.is_favorite %}Убрать из избранного{% else %}В избранное{% endif %}: {{ topic.text }}">
+      {% if topic.is_favorite %}★{% else %}☆{% endif %}
+    </button>
+  </form>
+
+  <div class="flex-grow-1 min-width-0">
+    <a class="topic-name" href="{% url 'learning_logs:topic' topic.pk %}">{{ topic.text }}</a>
+    <div class="meta">
+      {{ topic.entries_total }} зап.
+      {% if topic.entries_last %}· последняя {{ topic.entries_last|date:"j E Y" }}{% else %}· записей ещё нет{% endif %}
+      {% if topic.is_archived %}· <span class="badge badge-tag">в архиве</span>{% endif %}
+    </div>
+  </div>
+
+  <div class="text-nowrap ml-2">
+    <form method="post" action="{% url 'learning_logs:toggle_archive' topic.pk %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-link">
+        {% if topic.is_archived %}Вернуть{% else %}В архив{% endif %}</button>
+    </form>
+  </div>
+</div>

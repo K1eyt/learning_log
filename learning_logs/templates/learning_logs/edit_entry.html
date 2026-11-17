@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Изменить запись &middot; {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="panel panel-wide mx-auto">
+  <div class="panel-head">
+    <h1 class="h5 mb-0">Изменить запись</h1>
+    <a class="meta" href="{% url 'learning_logs:topic' topic.pk %}">{{ topic.text }}</a>
+  </div>
+  <div class="panel-body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <div class="d-flex flex-wrap">
+        {% bootstrap_button 'Сохранить' button_type='submit' button_class='btn-accent mr-2 mb-2' %}
+        <a class="btn btn-outline-secondary mb-2" href="{% url 'learning_logs:topic' topic.pk %}">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block menu %}
+  {% if user.is_authenticated %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'learning_logs:topics' %}">Темы</a></li>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  <div class="page-head">
+    <div>
+      <h1>Здравствуйте, {{ user.username }}</h1>
+      <p class="subtitle">Запишите, что нового вы поняли сегодня.</p>
+    </div>
+    <a class="btn btn-accent" href="{% url 'learning_logs:new_topic' %}">Новая тема</a>
+  </div>
+
+  <div class="tiles">
+    <a class="tile" href="{% url 'learning_logs:topics' %}">
+      <div class="num">{{ total_topics }}</div><div class="cap">тем в работе</div></a>
+    <div class="tile">
+      <div class="num">{{ total_entries }}</div><div class="cap">записей всего</div></div>
+    <a class="tile" href="{% url 'learning_logs:topics' %}?archived=1">
+      <div class="num">{{ total_archived }}</div><div class="cap">в архиве</div></a>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="h6 mb-0">Избранные темы</h2>
+      <a class="small" href="{% url 'learning_logs:topics' %}">Все темы</a>
+    </div>
+    {% if favorites %}
+      <div class="list-group list-group-flush">
+        {% for topic in favorites %}{% include 'learning_logs/_topic_row.html' %}{% endfor %}
+      </div>
+    {% else %}
+      <div class="panel-body text-muted">
+        Отметьте тему звёздочкой в списке тем, и она появится здесь.
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <section class="cover">
+    <h1>Журнал того, что вы изучаете</h1>
+    <p class="mb-4">Заведите тему на каждый предмет и добавляйте короткие записи после занятий.
+      Через месяц будет видно, сколько вы на самом деле прошли. Записи видны только вам.</p>
+    <a class="btn btn-accent btn-lg mr-2 mb-2" href="{% url 'users:register' %}">Завести журнал</a>
+    <a class="btn btn-outline-light btn-lg mb-2" href="{% url 'users:login' %}">Войти</a>
+  </section>
+
+  <div class="row">
+    <div class="col-md-4 mb-3"><div class="panel h-100"><div class="panel-body">
+      <h2 class="h6">Темы и записи</h2>
+      <p class="meta mb-0">Отдельная тема на предмет, книгу или навык. Внутри - записи с датой.</p>
+    </div></div></div>
+    <div class="col-md-4 mb-3"><div class="panel h-100"><div class="panel-body">
+      <h2 class="h6">Избранное и архив</h2>
+      <p class="meta mb-0">Важное наверху, отработанное - в архиве, а не в корзине.</p>
+    </div></div></div>
+    <div class="col-md-4 mb-3"><div class="panel h-100"><div class="panel-body">
+      <h2 class="h6">Только ваши данные</h2>
+      <p class="meta mb-0">Чужая тема не открывается даже по прямой ссылке: сервер отвечает 404.</p>
+    </div></div></div>
+  </div>
+{% endif %}
+{% endblock %}

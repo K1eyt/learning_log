@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}{{ topic.text }} &middot; {{ block.super }}{% endblock %}
+
+{% block menu %}
+  <li class="nav-item"><a class="nav-link active" href="{% url 'learning_logs:topics' %}">Темы</a></li>
+{% endblock %}
+
+{% block page_header %}
+<nav aria-label="Хлебные крошки">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'learning_logs:topics' %}">Мои темы</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ topic.text }}</li>
+  </ol>
+</nav>
+<div class="page-head">
+  <div>
+    <h1>{% if topic.is_favorite %}<span title="В избранном">★</span> {% endif %}{{ topic.text }}</h1>
+    <p class="subtitle">
+      Создана {{ topic.date_added|date:"j E Y" }}
+      {% if topic.is_archived %}· в архиве{% endif %}
+    </p>
+  </div>
+  <div class="text-nowrap">
+    <a class="btn btn-accent mb-1" href="{% url 'learning_logs:new_entry' topic.pk %}">Добавить запись</a>
+    <div class="btn-group mb-1">
+      <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">Ещё</button>
+      <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="{% url 'learning_logs:rename_topic' topic.pk %}">Переименовать</a>
+        <a class="dropdown-item" href="{% url 'learning_logs:export_topic' topic.pk %}">Скачать текстом</a>
+        <form method="post" action="{% url 'learning_logs:toggle_favorite' topic.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <button type="submit" class="dropdown-item">
+            {% if topic.is_favorite %}Убрать из избранного{% else %}В избранное{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'learning_logs:toggle_archive' topic.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="dropdown-item">
+            {% if topic.is_archived %}Вернуть из архива{% else %}Убрать в архив{% endif %}</button>
+        </form>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-danger" href="{% url 'learning_logs:delete_topic' topic.pk %}">Удалить тему</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% for entry in entries %}
+  <article class="panel">
+    <div class="panel-head">
+      <span class="meta">
+        {{ entry.date_added|date:"j E Y, H:i" }}
+        {% if entry.is_edited %}· исправлена {{ entry.date_modified|date:"j E Y, H:i" }}{% endif %}
+      </span>
+      <span class="text-nowrap">
+        <a class="btn btn-sm btn-link" href="{% url 'learning_logs:edit_entry' entry.pk %}">Изменить</a>
+        <a class="btn btn-sm btn-link text-danger" href="{% url 'learning_logs:delete_entry' entry.pk %}">Удалить</a>
+      </span>
+    </div>
+    <div class="panel-body rich-text">{{ entry.text }}</div>
+  </article>
+{% empty %}
+  <div class="empty">
+    <span class="icon" aria-hidden="true">✏️</span>
+    <p>В этой теме пока нет записей.</p>
+    <a class="btn btn-accent" href="{% url 'learning_logs:new_entry' topic.pk %}">Добавить первую</a>
+  </div>
+{% endfor %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+  <div class="d-flex justify-content-center mt-4">{% bootstrap_pagination page_obj %}</div>
+{% endif %}
+{% endblock %}
